@@ -1,0 +1,83 @@
+\documentclass[10pt,letterpaper]{article}
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage{url}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage[breaklinks=true,bookmarks=false,backref=page]{hyperref}
+\begin{document}
+	\title{\begin{figure}[htbp]
+			\centering
+			\includegraphics[width=4in]{logo.png}\\
+		\end{figure}\textbf{Weekly Work Report}}
+	\author{Liangjie Cao \\
+		\vspace*{0.5in} \\ 
+		\textbf{VISION@OUC} \\
+		\vspace*{1in}
+	}
+	\date{August 26, 2018}
+	\maketitle
+	\newpage
+\section{This week's work}
+This week  I and my partner Guan Cheng start to help our brother's work of video classification. Our first tqask is to make two lists. One of it is the train list, the other is val list. Our work is to get the results of UCF101 dataset and hmdb51 dataset with using non-local network. Actually we do have some problems at first, we finally make it. The accuracy of the UCF101 dataset is 96\% in top\_1 and 99\% in top\_5. Here's the non-local block network in Figure~\ref{se}.
+ \begin{figure}[!htb]
+ 	\centering
+ 	\includegraphics[width=0.5\textwidth]{se.png}\\
+ 	\caption{Non-local block network}\label{se}
+ \end{figure}
+\section{ResNet}
+It uses a connection method called "shortcut connection". As the name implies, shortcut means "cutting the road". We can roughly understand the following figure~\ref{f2}:
+ \begin{figure}[!htb]
+ 	\centering
+ 	\includegraphics[width=0.5\textwidth]{resnet.png}\\
+ 	\caption{Non-local block network}\label{f2}
+ \end{figure}
+  \begin{figure}[!htb]
+  	\centering
+  	\includegraphics[width=5in]{res50.png}\\
+  	\caption{Non-local block network}\label{f3}
+  \end{figure}
+\par Here, ResNet50 and ResNet101 are specially proposed, mainly because of their high appearance rate, so special instructions are needed. Given their specific structure in the following figure~\ref{f3}:
+\par First, let's take a look at the picture. The above five depths of ResNet are proposed, which are 18, 34, 50, 101 and 152. First, look at the left side of the picture. We found that all the networks are divided into five parts, namely: conv1. Conv2\_x, conv3\_x, conv4\_x, conv5\_x, and other papers later use this term to refer to each part of ResNet50 or 101.Take the 101-layer column, let's see if 101-layer is really a 101-layer network. First, we have a 7x7x64 convolution, then 3 + 4 + 23 + 3 = 33 building blocks, each block. It is 3 layers, so there are 33 x 3 = 99 layers, and finally there is an fc layer (for classification), so 1 + 99 + 1 = 101 layers, there is indeed a 101 layer network.(Actually I only know CNN now)
+\section{The basic codes of non-local network}
+I start to see the origin code about how the network is established with online help. To be honest, I can only know how it work but I cannot understand why it can work by using these several lines of code. Here's the create\_model function about the network in figure~\ref{f7}, it's construction is similar to the ResNet101. ResNet used in network structure and image classification has some differences in dimensions, but the overall network structure still contains conv1 to conv5\_x and some pooled and fully connected layers like ResNet. For ResNet-50, conv2\_x, conv3\_x, conv4\_x, conv5\_x The number of blocks is 3, 4, 6, and 3, respectively, for ResNet-101, 3, 4, 23, and 3, respectively.
+\par Actually I feel difficult at first, so I listened to my partner's advice. I try to type the basic code of CNN learned from Coursera for a full afternoon. It's really useful, thought I don't know how it works, I know the process of building a network is not a familiar work for me. I need these experience to enrich myself. CNN is a typical model for the beginner to learn. The connection is from my github~\url{https://github.com/Caoliangjie/CNN/blob/master/CNN.py}. 
+  \begin{figure}[!htb]
+  	\centering
+  	\includegraphics[width=3in]{code4.png}\\
+  	\caption{Code 4}\label{f7}
+  \end{figure}
+\par I have known how to build the basic model step by step. The process is obvious. Convolutional layer to pooling layer are all the basic unit. Non-local network's speciality is using the block called the non-local block. The code is also can be seen in figure~\ref{f9}. For ResNet-50's conv3\_x and conv4\_x, nonlocal\_mod is 2, So when num\_blocks==4 (\emph{e.g.} conv3\_x of ResNet-50), Then idx==1 or 3 will execute the non local operation, and the output blob\_in obtained by the non local operation will overwrite the blob\_in obtained by the regular block construct. Therefore, the effect is that every other block will be constructed in a non local manner. The last parameter that emphasizes the add\_nonlocal function is int(dim\_in / 2),That is, half of the number of input channels, and the number of channels is equal.
+  \begin{figure}[!htb]
+  	\centering
+  	\includegraphics[width=5in]{nln.png}\\
+  	\caption{nlnet function}\label{f9}
+  \end{figure}
+\section{Basic Work II}
+At Friday brother told us we should make sure how the network is built, and maybe we could build the network by ourselves. So I wonder how to do this first. The previous model I've test in my computer is C3D~\cite{name3}. I try to test on the server. We have two free GPUs to use, so I download the floders from their github and construct an virtual environment. During the traininig process, I wonder if I can transfer the i3D model to fit in the C3D training process. This is not a easy thing for us. Up to now, the training process hasn't be finished. To be honest, this method is a fundamental way for video recognition, very similiar to the two-stream. Anyway, I have to wait for the training result and test tomorrow. Then trying to transplant i3D in this framework. 
+\section{Some work in this week}
+Figure~\ref{fv} shows the training process of C3D, and figure~\ref{fx} is the work log from the non-local network for video recognition. Figure~\ref{fy} shows the test results of C3D in tensorflow framework.
+  \begin{figure}[!htb]
+  	\centering
+  	\includegraphics[width=0.5\textwidth]{test.png}\\
+  	\caption{C3D test result}\label{fy}
+  \end{figure}
+\section{Conclusion}
+Through this week's work, I learned that I still have a long way to go to video behavior recognition. This is not a simple matter, in order to ensure the smooth progress of future work. My plan is as follows:
+\par 1. communicate with my partner and the brother more, solve the question at the same day.
+\par 2. Understand the specific usage of the model in the paper.
+\par 3. Practice makes perfect, wheras for work or life.
+ \begin{figure}[!htb]
+ 	\centering
+ 	\includegraphics[width=0.5\textwidth]{nlnet.png}\\
+ 	\caption{Non-local test process}\label{fx}
+ \end{figure}
+  \begin{figure}[!htb]
+  	\centering
+  	\includegraphics[width=0.5\textwidth]{c3d.png}\\
+  	\caption{C3D training process}\label{fv}
+  \end{figure}
+\bibliographystyle{abbrv}
+\bibliography{ref1}
+\end{document}
